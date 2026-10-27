@@ -8,8 +8,10 @@ public class Gui extends JFrame {
     final int LARGURA = 854;
     
     // Atributos
+    int espessuraAtual = 10;
     Ferramenta modoAtual = Ferramenta.SELETOR;
     Color corAtual = Color.BLACK;
+    
     
     // Componentes de GUI
     // -Paineis
@@ -30,7 +32,7 @@ public class Gui extends JFrame {
     JButton btnTriangulo = new JButton();
     JButton btnPoligono = new JButton();
     // -Slider
-    JSlider sldrGrossura = new JSlider(JSlider.VERTICAL, 1, 100, 50);
+    JSlider sldrGrossura = new JSlider(JSlider.VERTICAL, 1, 100, espessuraAtual);
 
     // CONSTRUTOR:
     public Gui() {
@@ -106,6 +108,13 @@ public class Gui extends JFrame {
         this.add(pnlFerramentas, BorderLayout.NORTH);
         this.add(pnlCanvas, BorderLayout.CENTER);
         this.add(pnlBarraSlider, BorderLayout.WEST);
+        
+        // Action Listener
+        sldrGrossura.addChangeListener(e -> {
+            espessuraAtual = sldrGrossura.getValue();
+            System.out.println(espessuraAtual);
+            // Alterar espessura do painel de desenho tmb        
+        });  
     }
     // MOVER METODO DAQUI!
     /**
