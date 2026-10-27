@@ -14,10 +14,16 @@ public class Gui extends JFrame {
     
     
     // Componentes de GUI
+    
     // -Paineis
+    // --Paineis Principais (BorderLayout) 
     JPanel pnlFerramentas = new JPanel(); // Painel de ferramentas (Topo)
     JPanel pnlCanvas = new JPanel(); // Painel principal de desenho e pre-visulização dos tiles
     JPanel pnlBarraSlider = new JPanel(); // Painel para controlar a grossura do pincel
+    // --Paineis Canvas
+    Canvas tileCanvasA = new Canvas(true);
+    Canvas tileCanvasB = new Canvas(false);
+    
     // -Botões
     // --Ferramentas
     JButton btnSeletor = new JButton();
@@ -73,15 +79,18 @@ public class Gui extends JFrame {
         pnlBarraSlider.setLayout(new FlowLayout());
         // -Adicionando Componentese
         // --Centro (Tiles)
-        pnlCanvas.add(new JLabel()); // JLabel → placeholder de Tiles
-        pnlCanvas.add(new JLabel());
-        pnlCanvas.add(new JLabel());
-        pnlCanvas.add(new JLabel());
-        pnlCanvas.add(new Canvas()); // Campo de Desenho
-        pnlCanvas.add(new JLabel());
-        pnlCanvas.add(new JLabel());
-        pnlCanvas.add(new JLabel());
-        pnlCanvas.add(new JLabel());
+        tileCanvasA.setBackground(Color.WHITE);
+        tileCanvasB.setBackground(Color.GRAY);
+            // tlz precise colocar um componente pra cada coordenado do grid layout para poder ser detectado pelo trocarTile
+        pnlCanvas.add(tileCanvasB); // 1x1
+        pnlCanvas.add(tileCanvasB); // 1x2
+        pnlCanvas.add(tileCanvasB); // 1x3
+        pnlCanvas.add(tileCanvasB); // 2x1
+        pnlCanvas.add(tileCanvasA); // 2x2 // Campo de Desenho
+        pnlCanvas.add(tileCanvasB); // 2x3
+        pnlCanvas.add(tileCanvasB); // 3x1
+        pnlCanvas.add(tileCanvasB); // 3x2
+        pnlCanvas.add(tileCanvasB); // 3x3
         // --Norte (Barra de ferarmentas)
         pnlFerramentas.add(btnSeletor);
         pnlFerramentas.add(btnPincel);
