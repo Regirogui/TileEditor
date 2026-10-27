@@ -6,7 +6,11 @@ public class Gui extends JFrame {
     // constantes
     final int ALTURA = 854;
     final int LARGURA = 854;
-
+    
+    // Atributos
+    Ferramenta modoAtual = Ferramenta.SELETOR;
+    Color corAtual = Color.BLACK;
+    
     // Componentes de GUI
     // -Paineis
     JPanel pnlFerramentas = new JPanel(); // Painel de ferramentas (Topo)
