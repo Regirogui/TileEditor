@@ -118,7 +118,39 @@ public class Gui extends JFrame {
         this.add(pnlCanvas, BorderLayout.CENTER);
         this.add(pnlBarraSlider, BorderLayout.WEST);
         
-        // Action Listener
+        // -Action Listeners
+        // --Ferramentas
+        btnSeletor.addActionListener(e -> {
+            modoAtual = Ferramenta.SELETOR;
+        });
+        btnPincel.addActionListener(e -> {
+            modoAtual = Ferramenta.PINCEL;
+        });
+        btnBorracha.addActionListener(e -> {
+            modoAtual = Ferramenta.BORRACHA;
+        });
+        btnTrocarTile.addActionListener(e -> {
+            modoAtual = Ferramenta.TROCAR_TILE;
+        });
+        btnMostrarTiles.addActionListener(e -> {
+            modoAtual = Ferramenta.MOSTRAR_TILES;
+        });
+        btnReta.addActionListener(e -> {
+            modoAtual = Ferramenta.RETA;
+        });
+        btnRetangulo.addActionListener(e -> {
+            modoAtual = Ferramenta.RETANGULO;
+        });
+        btnCirculo.addActionListener(e -> {
+            modoAtual = Ferramenta.CIRCULO;
+        });
+        btnTriangulo.addActionListener(e -> {
+            modoAtual = Ferramenta.TRIANGULO;
+        });
+        btnPoligono.addActionListener(e -> {
+            modoAtual = Ferramenta.POLIGONO;
+        });
+
         sldrGrossura.addChangeListener(e -> {
             espessuraAtual = sldrGrossura.getValue();
             System.out.println(espessuraAtual);
