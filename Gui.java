@@ -21,8 +21,8 @@ public class Gui extends JFrame {
     JPanel pnlCanvas = new JPanel(); // Painel principal de desenho e pre-visulização dos tiles
     JPanel pnlBarraSlider = new JPanel(); // Painel para controlar a grossura do pincel
     // --Paineis Canvas
-    Canvas tileCanvasA = new Canvas(true);
-    Canvas tileCanvasB = new Canvas(false);
+    Canvas tileCanvasA = new Canvas(true, modoAtual, corAtual, espessuraAtual);
+    Canvas tileCanvasB = new Canvas(false, modoAtual, corAtual, espessuraAtual);
     
     // -Botões
     // --Ferramentas
