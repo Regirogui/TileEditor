@@ -13,8 +13,7 @@ public class Figura {
     Color cor;
     int espessura;
 
-    public Figura(Ferramenta tipo, int x1, int y1,
-                           int x2, int y2, int x3, int y3, int raio,
+    public Figura(Ferramenta tipo, int x1, int x2, int y2, int x3, int y3, int raio,
                            Color cor, int espessura) {
         this.tipo = tipo;
         this.x1 = x1;
