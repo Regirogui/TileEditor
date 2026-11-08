@@ -1,6 +1,8 @@
 import java.awt.*;
 import java.awt.Color;
+import java.awt.event.*;
 import javax.swing.*;
+
 
 public class Gui extends JFrame {
     // constantes
@@ -17,12 +19,11 @@ public class Gui extends JFrame {
     
     // -Paineis
     // --Paineis Principais (BorderLayout) 
-    JPanel pnlFerramentas = new JPanel(); // Painel de ferramentas (Topo)
-    JPanel pnlCanvas = new JPanel(); // Painel principal de desenho e pre-visulização dos tiles
-    JPanel pnlBarraSlider = new JPanel(); // Painel para controlar a grossura do pincel
-    // --Paineis Canvas
-    Canvas tileCanvasA = new Canvas(true, modoAtual, corAtual, espessuraAtual);
-    Canvas tileCanvasB = new Canvas(false, modoAtual, corAtual, espessuraAtual);
+    private JPanel pnlFerramentas = new JPanel(); // Painel de ferramentas (Topo)
+    private JPanel pnlTiles; // Painel principal de desenho e pre-visulização dos tiles
+    private JPanel[] tiles;
+    private JPanel pnlBarraSlider = new JPanel(); // Painel para controlar a grossura do pincel
+
     
     // -Botões
     // --Ferramentas
@@ -75,22 +76,11 @@ public class Gui extends JFrame {
         // Configuração Paineis
         // -Layout
         pnlFerramentas.setLayout(new FlowLayout());
-        pnlCanvas.setLayout(new GridLayout(3, 3));
+        criarGrid();
         pnlBarraSlider.setLayout(new FlowLayout());
         // -Adicionando Componentese
         // --Centro (Tiles)
-        tileCanvasA.setBackground(Color.WHITE);
-        tileCanvasB.setBackground(Color.GRAY);
-            // tlz precise colocar um componente pra cada coordenado do grid layout para poder ser detectado pelo trocarTile
-        pnlCanvas.add(tileCanvasB); // 1x1
-        pnlCanvas.add(tileCanvasB); // 1x2
-        pnlCanvas.add(tileCanvasB); // 1x3
-        pnlCanvas.add(tileCanvasB); // 2x1
-        pnlCanvas.add(tileCanvasA); // 2x2 // Campo de Desenho
-        pnlCanvas.add(tileCanvasB); // 2x3
-        pnlCanvas.add(tileCanvasB); // 3x1
-        pnlCanvas.add(tileCanvasB); // 3x2
-        pnlCanvas.add(tileCanvasB); // 3x3
+
         // --Norte (Barra de ferarmentas)
         pnlFerramentas.add(btnSeletor);
         pnlFerramentas.add(btnPincel);
@@ -106,16 +96,16 @@ public class Gui extends JFrame {
         pnlBarraSlider.add(sldrGrossura);
         // -Tamanho
         pnlFerramentas.setPreferredSize(new Dimension(100, 50));
-        pnlCanvas.setPreferredSize(new Dimension(100, 100));
+        pnlTiles.setPreferredSize(new Dimension(100, 100));
         pnlBarraSlider.setPreferredSize(new Dimension(100, 100));
         // -Cores para depuração
         pnlFerramentas.setBackground(Color.red);
-        pnlCanvas.setBackground(Color.green);
+        pnlTiles.setBackground(Color.green);
         pnlBarraSlider.setBackground(Color.blue);
 
         // Adição de Paineis
         this.add(pnlFerramentas, BorderLayout.NORTH);
-        this.add(pnlCanvas, BorderLayout.CENTER);
+        this.add(pnlTiles, BorderLayout.CENTER);
         this.add(pnlBarraSlider, BorderLayout.WEST);
         
         // -Action Listeners
@@ -157,6 +147,31 @@ public class Gui extends JFrame {
             // Alterar espessura do painel de desenho tmb        
         });  
     }
+
+    private void criarGrid(){
+        final int linhas = 3;
+        final int colunas = 3;
+
+        // Define o painel como um grid layout
+        pnlTiles = new JPanel(new GridLayout(linhas, colunas, 5, 5)); //lin, col, esp_h, esp_v
+        tiles = new JPanel[linhas*colunas];
+
+        for (int i = 0; i < tiles.length; i++) {
+            final int indice = i;
+
+            tiles[i] = new JPanel(new FlowLayout());
+
+            tiles[i].addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    System.out.println("Clicado");
+                }
+            });
+            pnlTiles.add(tiles[i]);
+        }
+    }
+
+
     // MOVER METODO DAQUI!
     /**
      * Redimensiona as imagens ícone
