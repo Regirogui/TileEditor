@@ -1,87 +1,120 @@
-import java.awt.*;
+import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.event.*;
-import javax.swing.*;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
+import java.awt.Image;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JSlider;
 
 public class Gui extends JFrame {
-    // constantes
-    final int ALTURA = 854;
-    final int LARGURA = 854;
-    
-    // Atributos
-    int espessuraAtual = 10;
-    Ferramenta modoAtual = Ferramenta.SELETOR;
-    Color corAtual = Color.BLACK;
-    
-    
-    // Componentes de GUI
-    
-    // -Paineis
-    // --Paineis Principais (BorderLayout) 
-    private JPanel pnlFerramentas = new JPanel(); // Painel de ferramentas (Topo)
-    private JPanel pnlTiles; // Painel principal de desenho e pre-visulização dos tiles
+
+    private static final int ALTURA = 854;
+    private static final int LARGURA = 854;
+    private static final int LINHAS = 3;
+    private static final int COLUNAS = 3;
+
+    private int espessuraAtual = 10;
+    private Ferramenta modoAtual = Ferramenta.SELETOR;
+    private Color corAtual = Color.BLACK;
+
+    private final JPanel pnlFerramentas = new JPanel(new FlowLayout());
+    private JPanel pnlTiles;
+    private final JPanel pnlBarraSlider = new JPanel(new FlowLayout());
+
+    // Uma célula visual por posição do grid.
     private JPanel[] tiles;
-    private JPanel pnlBarraSlider = new JPanel(); // Painel para controlar a grossura do pincel
 
-    
-    // -Botões
-    // --Ferramentas
-    JButton btnSeletor = new JButton();
-    JButton btnPincel = new JButton();
-    JButton btnBorracha = new JButton();
-    JButton btnTrocarTile = new JButton();
-    JButton btnMostrarTiles = new JButton();
-    // --Formas
-    JButton btnReta = new JButton();
-    JButton btnRetangulo = new JButton();
-    JButton btnCirculo = new JButton();
-    JButton btnTriangulo = new JButton();
-    JButton btnPoligono = new JButton();
-    // -Slider
-    JSlider sldrGrossura = new JSlider(JSlider.VERTICAL, 1, 100, espessuraAtual);
+    // Cada posição possui seu próprio Canvas.
+    // Não reutilize a mesma instância de Canvas em várias células:
+    // um componente Swing/AWT só pode ter um pai por vez.
+    private Canvas[] canvasTiles;
 
-    // CONSTRUTOR:
+    // Guarda o tipo lógico de cada posição.
+    private TipoTile[] tiposTiles;
+
+    private final JButton btnSeletor = new JButton();
+    private final JButton btnPincel = new JButton();
+    private final JButton btnBorracha = new JButton();
+    private final JButton btnTrocarTile = new JButton();
+    private final JButton btnMostrarTiles = new JButton();
+
+    private final JButton btnReta = new JButton();
+    private final JButton btnRetangulo = new JButton();
+    private final JButton btnCirculo = new JButton();
+    private final JButton btnTriangulo = new JButton();
+    private final JButton btnPoligono = new JButton();
+
+    private final JSlider sldrGrossura =
+            new JSlider(JSlider.VERTICAL, 1, 100, espessuraAtual);
+
+    private enum TipoTile {
+        A, B
+    }
+
     public Gui() {
         super("Editor de Tiles");
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setVisible(true);
+
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(LARGURA, ALTURA);
         setLayout(new BorderLayout());
 
-        // Configuração Botões
-        // TO DO: Botões escalonarem com o tamanho da tela
+        configurarBotoes();
+        criarGrid();
+        configurarPainelFerramentas();
+        configurarListeners();
+
+        pnlFerramentas.setPreferredSize(new Dimension(100, 50));
+        pnlBarraSlider.setPreferredSize(new Dimension(100, 100));
+
+        add(pnlFerramentas, BorderLayout.NORTH);
+        add(pnlTiles, BorderLayout.CENTER);
+        add(pnlBarraSlider, BorderLayout.WEST);
+
+        setLocationRelativeTo(null);
+        setVisible(true);
+    }
+
+    private void configurarBotoes() {
         btnSeletor.setIcon(new ImageIcon("./Icons/IconeSeletor.png"));
         btnSeletor.setToolTipText("Seletor");
+
         btnPincel.setIcon(new ImageIcon("./Icons/IconePincel.png"));
         btnPincel.setToolTipText("Pincel");
+
         btnBorracha.setIcon(new ImageIcon("./Icons/IconeBorracha.png"));
         btnBorracha.setToolTipText("Borracha");
+
         btnTrocarTile.setIcon(new ImageIcon("./Icons/IconeTrocarTile.png"));
         btnTrocarTile.setToolTipText("Trocar Tile");
+
         btnMostrarTiles.setIcon(new ImageIcon("./Icons/IconeMostrarTiles.png"));
-        btnMostrarTiles.setToolTipText("Previsualizacao de Tiles");
+        btnMostrarTiles.setToolTipText("Pré-visualização de Tiles");
+
         btnReta.setIcon(new ImageIcon("./Icons/IconeReta.png"));
         btnReta.setToolTipText("Reta");
+
         btnRetangulo.setIcon(new ImageIcon("./Icons/IconeRetangulo.png"));
-        btnRetangulo.setToolTipText("Retangulo");
+        btnRetangulo.setToolTipText("Retângulo");
+
         btnCirculo.setIcon(new ImageIcon("./Icons/IconeCirculo.png"));
-        btnCirculo.setToolTipText("Circulo");
+        btnCirculo.setToolTipText("Círculo");
+
         btnTriangulo.setIcon(new ImageIcon("./Icons/IconeTriangulo.png"));
-        btnTriangulo.setToolTipText("Triangulo");
+        btnTriangulo.setToolTipText("Triângulo");
+
         btnPoligono.setIcon(new ImageIcon("./Icons/IconePoligono.png"));
-        btnPoligono.setToolTipText("Poligono");
-        // Configuração Slider
+        btnPoligono.setToolTipText("Polígono");
+    }
 
-        // Configuração Paineis
-        // -Layout
-        pnlFerramentas.setLayout(new FlowLayout());
-        criarGrid();
-        pnlBarraSlider.setLayout(new FlowLayout());
-        // -Adicionando Componentese
-        // --Centro (Tiles)
-
-        // --Norte (Barra de ferarmentas)
+    private void configurarPainelFerramentas() {
         pnlFerramentas.add(btnSeletor);
         pnlFerramentas.add(btnPincel);
         pnlFerramentas.add(btnBorracha);
@@ -92,96 +125,159 @@ public class Gui extends JFrame {
         pnlFerramentas.add(btnCirculo);
         pnlFerramentas.add(btnTriangulo);
         pnlFerramentas.add(btnPoligono);
-        // --Oeste (Barra Deslizante)
+
         pnlBarraSlider.add(sldrGrossura);
-        // -Tamanho
-        pnlFerramentas.setPreferredSize(new Dimension(100, 50));
-        pnlTiles.setPreferredSize(new Dimension(100, 100));
-        pnlBarraSlider.setPreferredSize(new Dimension(100, 100));
-        // -Cores para depuração
-        pnlFerramentas.setBackground(Color.red);
-        pnlTiles.setBackground(Color.green);
-        pnlBarraSlider.setBackground(Color.blue);
-
-        // Adição de Paineis
-        this.add(pnlFerramentas, BorderLayout.NORTH);
-        this.add(pnlTiles, BorderLayout.CENTER);
-        this.add(pnlBarraSlider, BorderLayout.WEST);
-        
-        // -Action Listeners
-        // --Ferramentas
-        btnSeletor.addActionListener(e -> {
-            modoAtual = Ferramenta.SELETOR;
-        });
-        btnPincel.addActionListener(e -> {
-            modoAtual = Ferramenta.PINCEL;
-        });
-        btnBorracha.addActionListener(e -> {
-            modoAtual = Ferramenta.BORRACHA;
-        });
-        btnTrocarTile.addActionListener(e -> {
-            modoAtual = Ferramenta.TROCAR_TILE;
-        });
-        btnMostrarTiles.addActionListener(e -> {
-            modoAtual = Ferramenta.MOSTRAR_TILES;
-        });
-        btnReta.addActionListener(e -> {
-            modoAtual = Ferramenta.RETA;
-        });
-        btnRetangulo.addActionListener(e -> {
-            modoAtual = Ferramenta.RETANGULO;
-        });
-        btnCirculo.addActionListener(e -> {
-            modoAtual = Ferramenta.CIRCULO;
-        });
-        btnTriangulo.addActionListener(e -> {
-            modoAtual = Ferramenta.TRIANGULO;
-        });
-        btnPoligono.addActionListener(e -> {
-            modoAtual = Ferramenta.POLIGONO;
-        });
-
-        sldrGrossura.addChangeListener(e -> {
-            espessuraAtual = sldrGrossura.getValue();
-            System.out.println(espessuraAtual);
-            // Alterar espessura do painel de desenho tmb        
-        });  
     }
 
-    private void criarGrid(){
-        final int linhas = 3;
-        final int colunas = 3;
+    private void criarGrid() {
+        pnlTiles = new JPanel(
+                new GridLayout(LINHAS, COLUNAS, 5, 5)
+        );
 
-        // Define o painel como um grid layout
-        pnlTiles = new JPanel(new GridLayout(linhas, colunas, 5, 5)); //lin, col, esp_h, esp_v
-        tiles = new JPanel[linhas*colunas];
+        int quantidade = LINHAS * COLUNAS;
 
-        for (int i = 0; i < tiles.length; i++) {
+        tiles = new JPanel[quantidade];
+        canvasTiles = new Canvas[quantidade];
+        tiposTiles = new TipoTile[quantidade];
+
+        for (int i = 0; i < quantidade; i++) {
             final int indice = i;
 
-            tiles[i] = new JPanel(new FlowLayout());
+            tiles[i] = new JPanel(new BorderLayout());
+            tiles[i].setBorder(
+                    BorderFactory.createLineBorder(Color.DARK_GRAY)
+            );
 
-            tiles[i].addMouseListener(new MouseAdapter() {
+            // Distribui os tipos alternadamente: A, B, A, B...
+            tiposTiles[i] = (i % 2 == 0) ? TipoTile.A : TipoTile.B;
+
+            canvasTiles[i] = criarCanvas(tiposTiles[i]);
+            tiles[i].add(canvasTiles[i], BorderLayout.CENTER);
+
+            // O clique é registrado no Canvas, que ocupa a área da célula.
+            canvasTiles[i].addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    System.out.println("Clicado");
+                    tratarCliqueNoTile(indice);
                 }
             });
+
             pnlTiles.add(tiles[i]);
         }
     }
 
-
-    // MOVER METODO DAQUI!
-    /**
-     * Redimensiona as imagens ícone
-     * @param imgIcon imagem-ícone original a ser redimensionada
-     * @param x nova altura da imagem após o redimensionamento
-     * @param y nova largura da imagem após o redimensionamento
+    /*
+     * Pressuposto: o primeiro parâmetro booleano do seu Canvas indica
+     * se ele representa o tipo A (true) ou o tipo B (false).
+     *
+     * Se o booleano tiver outro significado na sua classe Canvas,
+     * ajuste esta linha conforme o construtor real.
      */
-    private ImageIcon getScaledIcon(ImageIcon imgIcon, int x, int y){
+    private Canvas criarCanvas(TipoTile tipo) {
+        boolean ehTipoA = (tipo == TipoTile.A);
+
+        return new Canvas(
+                ehTipoA,
+                modoAtual,
+                corAtual,
+                espessuraAtual
+        );
+    }
+
+    private void tratarCliqueNoTile(int indice) {
+        if (modoAtual == Ferramenta.TROCAR_TILE) {
+            trocarTipoTile(indice);
+        }
+    }
+
+    private void trocarTipoTile(int indice) {
+        if (indice < 0 || indice >= tiles.length) {
+            return;
+        }
+
+        // Alterna o tipo lógico do tile.
+        tiposTiles[indice] = (tiposTiles[indice] == TipoTile.A)
+                ? TipoTile.B
+                : TipoTile.A;
+
+        // Cria uma nova representação visual para o tipo atualizado.
+        Canvas novoCanvas = criarCanvas(tiposTiles[indice]);
+
+        // Substitui somente o Canvas desta posição.
+        JPanel celula = tiles[indice];
+        celula.removeAll();
+        celula.add(novoCanvas, BorderLayout.CENTER);
+
+        canvasTiles[indice] = novoCanvas;
+
+        // O novo Canvas também precisa receber o listener do mouse.
+        final int indiceFinal = indice;
+        novoCanvas.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                tratarCliqueNoTile(indiceFinal);
+            }
+        });
+
+        celula.revalidate();
+        celula.repaint();
+    }
+
+    private void configurarListeners() {
+        btnSeletor.addActionListener(e ->
+                modoAtual = Ferramenta.SELETOR
+        );
+
+        btnPincel.addActionListener(e ->
+                modoAtual = Ferramenta.PINCEL
+        );
+
+        btnBorracha.addActionListener(e ->
+                modoAtual = Ferramenta.BORRACHA
+        );
+
+        btnTrocarTile.addActionListener(e ->
+                modoAtual = Ferramenta.TROCAR_TILE
+        );
+
+        btnMostrarTiles.addActionListener(e ->
+                modoAtual = Ferramenta.MOSTRAR_TILES
+        );
+
+        btnReta.addActionListener(e ->
+                modoAtual = Ferramenta.RETA
+        );
+
+        btnRetangulo.addActionListener(e ->
+                modoAtual = Ferramenta.RETANGULO
+        );
+
+        btnCirculo.addActionListener(e ->
+                modoAtual = Ferramenta.CIRCULO
+        );
+
+        btnTriangulo.addActionListener(e ->
+                modoAtual = Ferramenta.TRIANGULO
+        );
+
+        btnPoligono.addActionListener(e ->
+                modoAtual = Ferramenta.POLIGONO
+        );
+
+        sldrGrossura.addChangeListener(e -> {
+            espessuraAtual = sldrGrossura.getValue();
+            // Depois, propague a nova espessura para os Canvas
+            // por meio de um método próprio, sem recriá-los.
+        });
+    }
+
+    /**
+     * Redimensiona uma imagem usada como ícone.
+     */
+    private ImageIcon getScaledIcon(ImageIcon imgIcon, int largura, int altura) {
         Image img = imgIcon.getImage();
-        img = img.getScaledInstance(x, y, Image.SCALE_SMOOTH);
+        img = img.getScaledInstance(largura, altura, Image.SCALE_SMOOTH);
         return new ImageIcon(img);
     }
+
 }
