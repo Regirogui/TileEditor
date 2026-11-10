@@ -13,6 +13,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
+import javax.swing.JColorChooser;
 
 public class Gui extends JFrame {
 
@@ -43,6 +44,7 @@ public class Gui extends JFrame {
     private final JButton btnSeletor = new JButton();
     private final JButton btnPincel = new JButton();
     private final JButton btnBorracha = new JButton();
+    private final JButton btnLimpar = new JButton();
     private final JButton btnTrocarTile = new JButton();
     private final JButton btnMostrarTiles = new JButton();
 
@@ -50,7 +52,8 @@ public class Gui extends JFrame {
     private final JButton btnRetangulo = new JButton();
     private final JButton btnCirculo = new JButton();
     private final JButton btnTriangulo = new JButton();
-    private final JButton btnPoligono = new JButton();
+    
+    private final JButton btnCores = new JButton();
 
     private final JSlider sldrGrossura =
             new JSlider(JSlider.VERTICAL, 1, 100, espessuraAtual);
@@ -91,6 +94,9 @@ public class Gui extends JFrame {
 
         btnBorracha.setIcon(new ImageIcon("./Icons/IconeBorracha.png"));
         btnBorracha.setToolTipText("Borracha");
+        
+        btnLimpar.setIcon(new ImageIcon("./Icons/IconeBorracha.png"));
+        btnLimpar.setToolTipText("Limpar Tela");
 
         btnTrocarTile.setIcon(new ImageIcon("./Icons/IconeTrocarTile.png"));
         btnTrocarTile.setToolTipText("Trocar Tile");
@@ -110,21 +116,22 @@ public class Gui extends JFrame {
         btnTriangulo.setIcon(new ImageIcon("./Icons/IconeTriangulo.png"));
         btnTriangulo.setToolTipText("Triângulo");
 
-        btnPoligono.setIcon(new ImageIcon("./Icons/IconePoligono.png"));
-        btnPoligono.setToolTipText("Polígono");
+        btnCores.setIcon(new ImageIcon("./Icons/IconePoligono.png"));
+        btnCores.setToolTipText("Seletor de Cores");
     }
 
     private void configurarPainelFerramentas() {
         pnlFerramentas.add(btnSeletor);
         pnlFerramentas.add(btnPincel);
         pnlFerramentas.add(btnBorracha);
+        pnlFerramentas.add(btnLimpar);
         pnlFerramentas.add(btnTrocarTile);
         pnlFerramentas.add(btnMostrarTiles);
         pnlFerramentas.add(btnReta);
         pnlFerramentas.add(btnRetangulo);
         pnlFerramentas.add(btnCirculo);
         pnlFerramentas.add(btnTriangulo);
-        pnlFerramentas.add(btnPoligono);
+        pnlFerramentas.add(btnCores);
 
         pnlBarraSlider.add(sldrGrossura);
     }
@@ -246,7 +253,22 @@ public class Gui extends JFrame {
 
         btnTriangulo.addActionListener(e -> definirModo(Ferramenta.TRIANGULO));
 
-        btnPoligono.addActionListener(e -> definirModo(Ferramenta.POLIGONO));
+        // TO DO: Ajeitar metodo !
+        btnCores.addActionListener(e -> {
+            Color c = JColorChooser.showDialog(null, "Escolha uma cor", Color.WHITE); 
+            if (c != null){ 
+                corAtual = c; // pega do chooserColor 
+                for (Canvas canvas : canvasTiles) {
+                    canvas.setCorAtual(c);
+                }
+            }
+
+            //Canvas.setCorAtual(corAtual); // cor atual
+            // Tlz fosse legal o background do botão de cor mostrar a cor atual
+            btnCores.setBackground(corAtual);
+            btnCores.revalidate();
+            btnCores.repaint();
+        }); 
 
         sldrGrossura.addChangeListener(e -> {
             espessuraAtual = sldrGrossura.getValue();

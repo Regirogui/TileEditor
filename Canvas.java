@@ -24,7 +24,6 @@ public class Canvas extends JPanel implements MouseListener, MouseMotionListener
     private boolean desenhando = false;
     private Shape figuraTemporaria;
     private Path2D caminhoAtual;
-    private final ArrayList<Point> pontosPoligono = new ArrayList<>();
 
     /**
      * @param tipoA true para Tile A e false para Tile B.
@@ -59,7 +58,6 @@ public class Canvas extends JPanel implements MouseListener, MouseMotionListener
         figuraTemporaria = null;
         caminhoAtual = null;
         pontosTriangulo = 0;
-        pontosPoligono.clear();
         repaint();
     }
 
@@ -160,9 +158,7 @@ public class Canvas extends JPanel implements MouseListener, MouseMotionListener
 
         if (modoAtual == Ferramenta.TRIANGULO) {
             adicionarPontoTriangulo(e.getPoint());
-        } else if (modoAtual == Ferramenta.POLIGONO) {
-            adicionarPontoPoligono(e);
-        }
+        } 
     }
 
     private void adicionarPontoTriangulo(Point p) {
@@ -185,24 +181,7 @@ public class Canvas extends JPanel implements MouseListener, MouseMotionListener
         }
     }
 
-    // Clique nos vértices; duplo clique no último vértice finaliza o polígono.
-    private void adicionarPontoPoligono(MouseEvent e) {
-        pontosPoligono.add(e.getPoint());
 
-        if (e.getClickCount() >= 2 && pontosPoligono.size() >= 3) {
-            Path2D poligono = new Path2D.Double();
-            Point primeiro = pontosPoligono.get(0);
-            poligono.moveTo(primeiro.x, primeiro.y);
-            for (int i = 1; i < pontosPoligono.size(); i++) {
-                Point p = pontosPoligono.get(i);
-                poligono.lineTo(p.x, p.y);
-            }
-            poligono.closePath();
-            figuras.add(new FiguraCanvas(poligono, corAtual, espessura));
-            pontosPoligono.clear();
-            repaint();
-        }
-    }
 
     @Override
     protected void paintComponent(Graphics g) {
@@ -220,22 +199,10 @@ public class Canvas extends JPanel implements MouseListener, MouseMotionListener
             Color cor = modoAtual == Ferramenta.BORRACHA ? getBackground() : corAtual;
             desenharForma(g2, caminhoAtual, cor, espessura);
         }
-        desenharPreviaPoligono(g2);
         g2.dispose();
     }
 
-    private void desenharPreviaPoligono(Graphics2D g2) {
-        if (pontosPoligono.size() < 2) return;
-        g2.setColor(corAtual);
-        g2.setStroke(new BasicStroke(espessura, BasicStroke.CAP_ROUND,
-                BasicStroke.JOIN_ROUND));
-        Point anterior = pontosPoligono.get(0);
-        for (int i = 1; i < pontosPoligono.size(); i++) {
-            Point atual = pontosPoligono.get(i);
-            g2.drawLine(anterior.x, anterior.y, atual.x, atual.y);
-            anterior = atual;
-        }
-    }
+
 
     private void desenharForma(Graphics2D g2, Shape forma, Color cor, int grossura) {
         g2.setColor(cor);
