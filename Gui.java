@@ -176,12 +176,16 @@ public class Gui extends JFrame {
     private Canvas criarCanvas(TipoTile tipo) {
         boolean ehTipoA = (tipo == TipoTile.A);
 
-        return new Canvas(
+        Canvas canvas = new Canvas(
                 ehTipoA,
                 modoAtual,
                 corAtual,
                 espessuraAtual
         );
+
+        canvas.setAoFinalizarDesenho(this::atualizarTodosCanvas);
+
+        return canvas;
     }
 
     private void tratarCliqueNoTile(int indice) {
@@ -224,51 +228,47 @@ public class Gui extends JFrame {
     }
 
     private void configurarListeners() {
-        btnSeletor.addActionListener(e ->
-                modoAtual = Ferramenta.SELETOR
-        );
+        btnSeletor.addActionListener(e -> definirModo(Ferramenta.SELETOR));
 
-        btnPincel.addActionListener(e ->
-                modoAtual = Ferramenta.PINCEL
-        );
+        btnPincel.addActionListener(e -> definirModo(Ferramenta.PINCEL));
 
-        btnBorracha.addActionListener(e ->
-                modoAtual = Ferramenta.BORRACHA
-        );
+        btnBorracha.addActionListener(e -> definirModo(Ferramenta.BORRACHA));
 
-        btnTrocarTile.addActionListener(e ->
-                modoAtual = Ferramenta.TROCAR_TILE
-        );
+        btnTrocarTile.addActionListener(e -> definirModo(Ferramenta.TROCAR_TILE));
 
-        btnMostrarTiles.addActionListener(e ->
-                modoAtual = Ferramenta.MOSTRAR_TILES
-        );
+        btnMostrarTiles.addActionListener(e -> definirModo(Ferramenta.MOSTRAR_TILES));
 
-        btnReta.addActionListener(e ->
-                modoAtual = Ferramenta.RETA
-        );
+        btnReta.addActionListener(e -> definirModo(Ferramenta.RETA));
 
-        btnRetangulo.addActionListener(e ->
-                modoAtual = Ferramenta.RETANGULO
-        );
+        btnRetangulo.addActionListener(e -> definirModo(Ferramenta.RETANGULO));
 
-        btnCirculo.addActionListener(e ->
-                modoAtual = Ferramenta.CIRCULO
-        );
+        btnCirculo.addActionListener(e -> definirModo(Ferramenta.CIRCULO));
 
-        btnTriangulo.addActionListener(e ->
-                modoAtual = Ferramenta.TRIANGULO
-        );
+        btnTriangulo.addActionListener(e -> definirModo(Ferramenta.TRIANGULO));
 
-        btnPoligono.addActionListener(e ->
-                modoAtual = Ferramenta.POLIGONO
-        );
+        btnPoligono.addActionListener(e -> definirModo(Ferramenta.POLIGONO));
 
         sldrGrossura.addChangeListener(e -> {
             espessuraAtual = sldrGrossura.getValue();
-            // Depois, propague a nova espessura para os Canvas
-            // por meio de um método próprio, sem recriá-los.
+            for (Canvas canvas : canvasTiles) {
+                canvas.setEspessura(espessuraAtual);
+            }
         });
+    }
+
+    private void definirModo(Ferramenta novoModo) {
+        modoAtual = novoModo;
+        for (Canvas canvas : canvasTiles) {
+            canvas.setModoAtual(novoModo);
+        }
+    }
+
+    private void atualizarTodosCanvas() {
+        for (Canvas canvas : canvasTiles) {
+            if (canvas != null) {
+                canvas.repaint();
+            }
+        }
     }
 
     /**
