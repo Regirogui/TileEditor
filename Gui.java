@@ -7,18 +7,12 @@ import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JSlider;
-import javax.swing.JColorChooser;
+import javax.swing.*;
 
 public class Gui extends JFrame {
 
-    private static final int ALTURA = 854;
-    private static final int LARGURA = 854;
+    private static final int ALTURA = 855;
+    private static final int LARGURA = 855;
     private static final int LINHAS = 3;
     private static final int COLUNAS = 3;
 
@@ -55,8 +49,8 @@ public class Gui extends JFrame {
     
     private final JButton btnCores = new JButton();
 
-    private final JSlider sldrGrossura =
-            new JSlider(JSlider.VERTICAL, 1, 100, espessuraAtual);
+    private final JSlider sldrGrossura = new JSlider(JSlider.VERTICAL, 1, 100, espessuraAtual);
+    //private final JLabel lblEspessura = new JLabel("Espessura");
 
     private enum TipoTile {
         A, B
@@ -86,37 +80,75 @@ public class Gui extends JFrame {
     }
 
     private void configurarBotoes() {
-        btnSeletor.setIcon(new ImageIcon("./Icons/IconeSeletor.png"));
+        int size = (int)(ALTURA*0.03);
+        String path = "";
+        ImageIcon icone;
+
+        path = "./Icons/IconeSeletor.png";
+        icone = new ImageIcon(path);
+        icone = getScaledIcon(icone, size, size);
+        btnSeletor.setIcon(icone);
         btnSeletor.setToolTipText("Seletor");
 
-        btnPincel.setIcon(new ImageIcon("./Icons/IconePincel.png"));
+
+        path = "./Icons/IconePincel.png";
+        icone = new ImageIcon(path);
+        icone = getScaledIcon(icone, size, size);
+        btnPincel.setIcon(icone);
         btnPincel.setToolTipText("Pincel");
 
-        btnBorracha.setIcon(new ImageIcon("./Icons/IconeBorracha.png"));
+        path = "./Icons/IconeBorracha.png";
+        icone = new ImageIcon(path);
+        icone = getScaledIcon(icone, size, size);
+        btnBorracha.setIcon(icone);
         btnBorracha.setToolTipText("Borracha");
-        
-        btnLimpar.setIcon(new ImageIcon("./Icons/IconeBorracha.png"));
+
+        path = "./Icons/IconeLimpar.png";
+        icone = new ImageIcon(path);
+        icone = getScaledIcon(icone, size, size);
+        btnLimpar.setIcon(icone);
         btnLimpar.setToolTipText("Limpar Tela");
 
-        btnTrocarTile.setIcon(new ImageIcon("./Icons/IconeTrocarTile.png"));
+        path = "./Icons/IconeTrocarTile.png";
+        icone = new ImageIcon(path);
+        icone = getScaledIcon(icone, size, size);
+        btnTrocarTile.setIcon(icone);
         btnTrocarTile.setToolTipText("Trocar Tile");
 
-        btnMostrarTiles.setIcon(new ImageIcon("./Icons/IconeMostrarTiles.png"));
-        btnMostrarTiles.setToolTipText("Pré-visualização de Tiles");
+        path = "./Icons/IconeMostrarTiles.png";
+        icone = new ImageIcon(path);
+        icone = getScaledIcon(icone, size, size);
+        btnMostrarTiles.setIcon(icone);
+        btnMostrarTiles.setToolTipText("Mostrar Tile");
 
-        btnReta.setIcon(new ImageIcon("./Icons/IconeReta.png"));
+        path = "./Icons/IconeReta.png";
+        icone = new ImageIcon(path);
+        icone = getScaledIcon(icone, size, size);
+        btnReta.setIcon(icone);
         btnReta.setToolTipText("Reta");
 
-        btnRetangulo.setIcon(new ImageIcon("./Icons/IconeRetangulo.png"));
-        btnRetangulo.setToolTipText("Retângulo");
+        path = "./Icons/IconeRetangulo.png";
+        icone = new ImageIcon(path);
+        icone = getScaledIcon(icone, size, size);
+        btnRetangulo.setIcon(icone);
+        btnRetangulo.setToolTipText("Retangulo");
 
-        btnCirculo.setIcon(new ImageIcon("./Icons/IconeCirculo.png"));
-        btnCirculo.setToolTipText("Círculo");
+        path = "./Icons/IconeCirculo.png";
+        icone = new ImageIcon(path);
+        icone = getScaledIcon(icone, size, size);
+        btnCirculo.setIcon(icone);
+        btnCirculo.setToolTipText("Circulo");
 
-        btnTriangulo.setIcon(new ImageIcon("./Icons/IconeTriangulo.png"));
+        path = "./Icons/IconeTriangulo.png";
+        icone = new ImageIcon(path);
+        icone = getScaledIcon(icone, size, size);
+        btnTriangulo.setIcon(icone);
         btnTriangulo.setToolTipText("Triângulo");
 
-        btnCores.setIcon(new ImageIcon("./Icons/IconePoligono.png"));
+        path = "./Icons/IconeSeletorCores.png";
+        icone = new ImageIcon(path);
+        icone = getScaledIcon(icone, size, size);
+        btnCores.setIcon(icone);
         btnCores.setToolTipText("Seletor de Cores");
     }
 
@@ -134,6 +166,7 @@ public class Gui extends JFrame {
         pnlFerramentas.add(btnCores);
 
         pnlBarraSlider.add(sldrGrossura);
+        //pnlBarraSlider.add(lblEspessura);
     }
 
     private void criarGrid() {
@@ -297,8 +330,16 @@ public class Gui extends JFrame {
      * Redimensiona uma imagem usada como ícone.
      */
     private ImageIcon getScaledIcon(ImageIcon imgIcon, int largura, int altura) {
-        Image img = imgIcon.getImage();
-        img = img.getScaledInstance(largura, altura, Image.SCALE_SMOOTH);
+        if (imgIcon == null) {
+            return null;
+        }
+
+        Image img = imgIcon.getImage().getScaledInstance(
+                largura,
+                altura,
+                Image.SCALE_SMOOTH
+        );
+
         return new ImageIcon(img);
     }
 
