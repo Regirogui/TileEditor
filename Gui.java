@@ -274,6 +274,14 @@ public class Gui extends JFrame {
 
         btnBorracha.addActionListener(e -> definirModo(Ferramenta.BORRACHA));
 
+        btnLimpar.addActionListener(e -> {
+            int escolha = JOptionPane.showConfirmDialog(null, "limpar TODOS os ladrilhos?",
+                                                   "Limpar Tela", JOptionPane.YES_NO_OPTION);
+            if (escolha == JOptionPane.YES_OPTION){
+                System.out.println("Implementar elimitar desenhos");
+            }
+        });
+        
         btnTrocarTile.addActionListener(e -> definirModo(Ferramenta.TROCAR_TILE));
 
         btnMostrarTiles.addActionListener(e -> definirModo(Ferramenta.MOSTRAR_TILES));
