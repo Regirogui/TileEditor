@@ -22,8 +22,7 @@ public class Gui extends JFrame {
 
     private final JPanel pnlFerramentas = new JPanel(new FlowLayout());
     private JPanel pnlTiles;
-    private JPanel pnlBarraSlider = new JPanel();
-
+    private final JPanel pnlBarraSlider = new JPanel(new FlowLayout());
 
     // Uma célula visual por posição do grid.
     private JPanel[] tiles;
@@ -50,8 +49,8 @@ public class Gui extends JFrame {
 
     private final JButton btnCores = new JButton();
 
+    private final JLabel lblEspessura = new JLabel("Esp.");
     private final JSlider sldrGrossura = new JSlider(JSlider.VERTICAL, 1, 100, espessuraAtual);
-    private final JLabel lblEspessura = new JLabel("Grossura");
 
     private enum TipoTile {
         A, B
@@ -63,14 +62,12 @@ public class Gui extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(LARGURA, ALTURA);
         setLayout(new BorderLayout());
-        setResizable(false);
 
         configurarBotoes();
         criarGrid();
         configurarPainelFerramentas();
         configurarListeners();
 
-        pnlBarraSlider.setLayout(new FlowLayout());
         pnlFerramentas.setPreferredSize(new Dimension(100, 50));
         pnlBarraSlider.setPreferredSize(new Dimension(100, 100));
 
@@ -170,7 +167,6 @@ public class Gui extends JFrame {
 
         pnlBarraSlider.add(lblEspessura);
         pnlBarraSlider.add(sldrGrossura);
-
     }
 
     private void criarGrid() {
@@ -296,7 +292,7 @@ public class Gui extends JFrame {
 
         btnTrocarTile.addActionListener(e -> definirModo(Ferramenta.TROCAR_TILE));
 
-        btnMostrarTiles.addActionListener(e -> definirModo(Ferramenta.MOSTRAR_TILES));
+        btnMostrarTiles.addActionListener(e -> abrirJanelaLadrilho());
 
         btnReta.addActionListener(e -> definirModo(Ferramenta.RETA));
 
@@ -310,7 +306,7 @@ public class Gui extends JFrame {
         btnCores.addActionListener(e -> {
             Color c = JColorChooser.showDialog(null, "Escolha uma cor", Color.WHITE);
             if (c != null){
-                corAtual = c; // pega do chooserColor 
+                corAtual = c; // pega do chooserColor
                 for (Canvas canvas : canvasTiles) {
                     canvas.setCorAtual(c);
                 }
@@ -336,6 +332,17 @@ public class Gui extends JFrame {
         for (Canvas canvas : canvasTiles) {
             canvas.setModoAtual(novoModo);
         }
+    }
+
+
+    /** Abre uma visualização do mosaico usando os desenhos feitos nos Canvas. */
+    private void abrirJanelaLadrilho() {
+        boolean[] tipos = new boolean[tiposTiles.length];
+        for (int i = 0; i < tiposTiles.length; i++) {
+            tipos[i] = (tiposTiles[i] == TipoTile.A);
+        }
+
+        new JanelaLadrilho(LINHAS, COLUNAS, tipos);
     }
 
     private void atualizarTodosCanvas() {

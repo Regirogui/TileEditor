@@ -127,11 +127,11 @@ public class Canvas extends JPanel implements MouseListener, MouseMotionListener
         if (modoAtual == Ferramenta.PINCEL || modoAtual == Ferramenta.BORRACHA) {
             caminhoAtual.lineTo(x2, y2);
             Color cor = modoAtual == Ferramenta.BORRACHA ? getBackground() : corAtual;
-            figuras.add(new FiguraCanvas(caminhoAtual, cor, espessura));
+            figuras.add(new FiguraCanvas(caminhoAtual, cor, espessura, getWidth(), getHeight()));
         } else {
             atualizarFiguraTemporaria();
             if (figuraTemporaria != null) {
-                figuras.add(new FiguraCanvas(figuraTemporaria, corAtual, espessura));
+                figuras.add(new FiguraCanvas(figuraTemporaria, corAtual, espessura, getWidth(), getHeight()));
             }
         }
 
@@ -194,7 +194,7 @@ public class Canvas extends JPanel implements MouseListener, MouseMotionListener
             triangulo.lineTo(x2, y2);
             triangulo.lineTo(x3, y3);
             triangulo.closePath();
-            figuras.add(new FiguraCanvas(triangulo, corAtual, espessura));
+            figuras.add(new FiguraCanvas(triangulo, corAtual, espessura, getWidth(), getHeight()));
             pontosTriangulo = 0;
             repaint();
             aoFinalizarDesenho.run();
@@ -224,6 +224,14 @@ public class Canvas extends JPanel implements MouseListener, MouseMotionListener
 
 
 
+    /** Desenha os desenhos compartilhados de um tipo de ladrilho em qualquer tamanho. */
+    public static void desenharFiguras(Graphics2D g2, boolean tipoA, int largura, int altura) {
+        ArrayList<FiguraCanvas> lista = tipoA ? figurasA : figurasB;
+        for (FiguraCanvas figura : lista) {
+            figura.desenharEscalado(g2, largura, altura);
+        }
+    }
+
     private void desenharForma(Graphics2D g2, Shape forma, Color cor, int grossura) {
         g2.setColor(cor);
         g2.setStroke(new BasicStroke(grossura, BasicStroke.CAP_ROUND,
@@ -235,18 +243,30 @@ public class Canvas extends JPanel implements MouseListener, MouseMotionListener
         private final Shape forma;
         private final Color cor;
         private final int espessura;
+        private final int larguraOrigem;
+        private final int alturaOrigem;
 
-        FiguraCanvas(Shape forma, Color cor, int espessura) {
+        FiguraCanvas(Shape forma, Color cor, int espessura, int larguraOrigem, int alturaOrigem) {
             this.forma = forma;
             this.cor = cor;
             this.espessura = espessura;
+            this.larguraOrigem = Math.max(1, larguraOrigem);
+            this.alturaOrigem = Math.max(1, alturaOrigem);
         }
 
         void desenhar(Graphics2D g2) {
-            g2.setColor(cor);
-            g2.setStroke(new BasicStroke(espessura, BasicStroke.CAP_ROUND,
+            desenharEscalado(g2, larguraOrigem, alturaOrigem);
+        }
+
+        void desenharEscalado(Graphics2D g2, int largura, int altura) {
+            Graphics2D copia = (Graphics2D) g2.create();
+            copia.scale((double) largura / larguraOrigem,
+                    (double) altura / alturaOrigem);
+            copia.setColor(cor);
+            copia.setStroke(new BasicStroke(espessura, BasicStroke.CAP_ROUND,
                     BasicStroke.JOIN_ROUND));
-            g2.draw(forma);
+            copia.draw(forma);
+            copia.dispose();
         }
     }
 
