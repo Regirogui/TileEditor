@@ -9,6 +9,15 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.*;
 
+/**
+ * Janela principal da aplicação "Editor de Tiles".
+ * Gerencia a interface gráfica, a barra de ferramentas de desenho, o seletor de cores
+ * e espessura, além da grade interativa de ladrilhos (Tiles do tipo A e B).
+ *
+ * @author Arthur A.
+ * @version 17/11/2026
+ * @since 20/10/2026
+ */
 public class Gui extends JFrame {
 
     private static final int ALTURA = 855;
@@ -52,10 +61,21 @@ public class Gui extends JFrame {
     private final JLabel lblEspessura = new JLabel("Esp.");
     private final JSlider sldrGrossura = new JSlider(JSlider.VERTICAL, 1, 100, espessuraAtual);
 
+    /**
+     * Enumeração interna que identifica os dois tipos lógicos de ladrilho disponíveis na grade.
+     *
+     * @author Arthur A.
+     * @version 17/11/2026
+     * @since 17/11/2026
+     */
     private enum TipoTile {
         A, B
     }
 
+    /**
+     * Constrói e exibe a janela principal do editor, inicializando os botões,
+     * a grade de tiles, os painéis laterais e os ouvintes de eventos.
+     */
     public Gui() {
         super("Editor de Tiles");
 
@@ -79,6 +99,10 @@ public class Gui extends JFrame {
         setVisible(true);
     }
 
+    /**
+     * Carrega, redimensiona e atribui os ícones e dicas de ferramentas (tooltips)
+     * a todos os botões da barra superior.
+     */
     private void configurarBotoes() {
         int size = (int)(ALTURA*0.03);
         String path = "";
@@ -89,7 +113,6 @@ public class Gui extends JFrame {
         icone = getScaledIcon(icone, size, size);
         btnSeletor.setIcon(icone);
         btnSeletor.setToolTipText("Seletor");
-
 
         path = "./Icons/IconePincel.png";
         icone = new ImageIcon(path);
@@ -152,6 +175,9 @@ public class Gui extends JFrame {
         btnCores.setToolTipText("Seletor de Cores");
     }
 
+    /**
+     * Adiciona os botões de ferramentas ao painel superior e os controles de espessura ao painel lateral.
+     */
     private void configurarPainelFerramentas() {
         pnlFerramentas.add(btnSeletor);
         pnlFerramentas.add(btnPincel);
@@ -169,6 +195,10 @@ public class Gui extends JFrame {
         pnlBarraSlider.add(sldrGrossura);
     }
 
+    /**
+     * Inicializa a grade de células, alternando inicialmente os tipos de tile (A e B)
+     * e instanciando um componente {@link Canvas} independente para cada posição.
+     */
     private void criarGrid() {
         pnlTiles = new JPanel(
                 new GridLayout(LINHAS, COLUNAS, 5, 5)
@@ -206,12 +236,11 @@ public class Gui extends JFrame {
         }
     }
 
-    /*
-     * Pressuposto: o primeiro parâmetro booleano do seu Canvas indica
-     * se ele representa o tipo A (true) ou o tipo B (false).
+    /**
+     * Cria e configura uma nova instância de {@link Canvas} correspondente ao tipo de ladrilho informado.
      *
-     * Se o booleano tiver outro significado na sua classe Canvas,
-     * ajuste esta linha conforme o construtor real.
+     * @param tipo o {@link TipoTile} (A ou B) que determina o conjunto de desenhos compartilhados.
+     * @return uma nova instância configurada de {@link Canvas}.
      */
     private Canvas criarCanvas(TipoTile tipo) {
         boolean ehTipoA = (tipo == TipoTile.A);
@@ -228,12 +257,23 @@ public class Gui extends JFrame {
         return canvas;
     }
 
+    /**
+     * Verifica se a ferramenta ativa é a troca de tile e executa a alternância na célula clicada.
+     *
+     * @param indice a posição da célula clicada no vetor da grade.
+     */
     private void tratarCliqueNoTile(int indice) {
         if (modoAtual == Ferramenta.TROCAR_TILE) {
             trocarTipoTile(indice);
         }
     }
 
+    /**
+     * Alterna o tipo lógico de uma célula específica entre {@code TipoTile.A} e {@code TipoTile.B},
+     * substituindo seu componente {@link Canvas} por um novo vinculado ao tipo atualizado.
+     *
+     * @param indice o índice da célula na grade a ser alterada.
+     */
     private void trocarTipoTile(int indice) {
         if (indice < 0 || indice >= tiles.length) {
             return;
@@ -267,6 +307,10 @@ public class Gui extends JFrame {
         celula.repaint();
     }
 
+    /**
+     * Registra os ouvintes de ação (ActionListeners) e de mudança (ChangeListeners)
+     * para todos os botões de ferramentas, seletor de cores e controle deslizante de espessura.
+     */
     private void configurarListeners() {
         btnSeletor.addActionListener(e -> definirModo(Ferramenta.SELETOR));
 
@@ -327,6 +371,11 @@ public class Gui extends JFrame {
         });
     }
 
+    /**
+     * Atualiza a ferramenta ativa na interface e propaga a mudança para todos os {@link Canvas} da grade.
+     *
+     * @param novoModo a nova {@link Ferramenta} selecionada pelo usuário.
+     */
     private void definirModo(Ferramenta novoModo) {
         modoAtual = novoModo;
         for (Canvas canvas : canvasTiles) {
@@ -334,8 +383,10 @@ public class Gui extends JFrame {
         }
     }
 
-
-    /** Abre uma visualização do mosaico usando os desenhos feitos nos Canvas. */
+    /**
+     * Converte a configuração atual de tipos de ladrilhos da grade e abre uma instância
+     * de {@link JanelaLadrilho} para pré-visualizar o mosaico montado.
+     */
     private void abrirJanelaLadrilho() {
         boolean[] tipos = new boolean[tiposTiles.length];
         for (int i = 0; i < tiposTiles.length; i++) {
@@ -345,6 +396,10 @@ public class Gui extends JFrame {
         new JanelaLadrilho(LINHAS, COLUNAS, tipos);
     }
 
+    /**
+     * Solicita a repintura de todos os componentes {@link Canvas} da grade para sincronizar
+     * visualmente os desenhos compartilhados.
+     */
     private void atualizarTodosCanvas() {
         for (Canvas canvas : canvasTiles) {
             if (canvas != null) {
@@ -354,7 +409,12 @@ public class Gui extends JFrame {
     }
 
     /**
-     * Redimensiona uma imagem usada como ícone.
+     * Redimensiona suavemente um ícone para as dimensões especificadas.
+     *
+     * @param imgIcon o {@link ImageIcon} original a ser redimensionado.
+     * @param largura a largura desejada em pixels.
+     * @param altura  a altura desejada em pixels.
+     * @return um novo {@link ImageIcon} redimensionado, ou {@code null} se o ícone original for nulo.
      */
     private ImageIcon getScaledIcon(ImageIcon imgIcon, int largura, int altura) {
         if (imgIcon == null) {
