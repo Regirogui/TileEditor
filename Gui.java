@@ -22,7 +22,8 @@ public class Gui extends JFrame {
 
     private final JPanel pnlFerramentas = new JPanel(new FlowLayout());
     private JPanel pnlTiles;
-    private final JPanel pnlBarraSlider = new JPanel(new FlowLayout());
+    private JPanel pnlBarraSlider = new JPanel();
+
 
     // Uma célula visual por posição do grid.
     private JPanel[] tiles;
@@ -46,11 +47,11 @@ public class Gui extends JFrame {
     private final JButton btnRetangulo = new JButton();
     private final JButton btnCirculo = new JButton();
     private final JButton btnTriangulo = new JButton();
-    
+
     private final JButton btnCores = new JButton();
 
     private final JSlider sldrGrossura = new JSlider(JSlider.VERTICAL, 1, 100, espessuraAtual);
-    //private final JLabel lblEspessura = new JLabel("Espessura");
+    private final JLabel lblEspessura = new JLabel("Grossura");
 
     private enum TipoTile {
         A, B
@@ -62,12 +63,14 @@ public class Gui extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(LARGURA, ALTURA);
         setLayout(new BorderLayout());
+        setResizable(false);
 
         configurarBotoes();
         criarGrid();
         configurarPainelFerramentas();
         configurarListeners();
 
+        pnlBarraSlider.setLayout(new FlowLayout());
         pnlFerramentas.setPreferredSize(new Dimension(100, 50));
         pnlBarraSlider.setPreferredSize(new Dimension(100, 100));
 
@@ -165,8 +168,9 @@ public class Gui extends JFrame {
         pnlFerramentas.add(btnTriangulo);
         pnlFerramentas.add(btnCores);
 
+        pnlBarraSlider.add(lblEspessura);
         pnlBarraSlider.add(sldrGrossura);
-        //pnlBarraSlider.add(lblEspessura);
+
     }
 
     private void criarGrid() {
@@ -276,12 +280,20 @@ public class Gui extends JFrame {
 
         btnLimpar.addActionListener(e -> {
             int escolha = JOptionPane.showConfirmDialog(null, "limpar TODOS os ladrilhos?",
-                                                   "Limpar Tela", JOptionPane.YES_NO_OPTION);
-            if (escolha == JOptionPane.YES_OPTION){
-                System.out.println("Implementar elimitar desenhos");
+                    "Limpar Tela", JOptionPane.YES_NO_OPTION);
+            if (escolha == JOptionPane.YES_OPTION) {
+                // As listas de figuras são compartilhadas: limpa A e B.
+                Canvas.limparTodasFiguras();
+
+                // Também descarta desenhos incompletos (ex.: triângulo
+                // que ainda recebeu apenas um ou dois cliques).
+                for (Canvas canvas : canvasTiles) {
+                    canvas.cancelarDesenhoEmAndamento();
+                    canvas.repaint();
+                }
             }
         });
-        
+
         btnTrocarTile.addActionListener(e -> definirModo(Ferramenta.TROCAR_TILE));
 
         btnMostrarTiles.addActionListener(e -> definirModo(Ferramenta.MOSTRAR_TILES));
@@ -296,8 +308,8 @@ public class Gui extends JFrame {
 
         // TO DO: Ajeitar metodo !
         btnCores.addActionListener(e -> {
-            Color c = JColorChooser.showDialog(null, "Escolha uma cor", Color.WHITE); 
-            if (c != null){ 
+            Color c = JColorChooser.showDialog(null, "Escolha uma cor", Color.WHITE);
+            if (c != null){
                 corAtual = c; // pega do chooserColor 
                 for (Canvas canvas : canvasTiles) {
                     canvas.setCorAtual(c);
@@ -309,7 +321,7 @@ public class Gui extends JFrame {
             btnCores.setBackground(corAtual);
             btnCores.revalidate();
             btnCores.repaint();
-        }); 
+        });
 
         sldrGrossura.addChangeListener(e -> {
             espessuraAtual = sldrGrossura.getValue();

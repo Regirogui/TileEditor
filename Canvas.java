@@ -53,6 +53,21 @@ public class Canvas extends JPanel implements MouseListener, MouseMotionListener
         espessura = Math.max(1, esp);
     }
 
+    /**
+     * Apaga os desenhos compartilhados por todos os Canvas dos tipos A e B.
+     */
+    public static void limparTodasFiguras() {
+        figurasA.clear();
+        figurasB.clear();
+    }
+
+    /**
+     * Cancela qualquer desenho que ainda esteja em andamento neste Canvas.
+     */
+    public void cancelarDesenhoEmAndamento() {
+        cancelarDesenhoTemporario();
+    }
+
     private void cancelarDesenhoTemporario() {
         desenhando = false;
         figuraTemporaria = null;
@@ -65,16 +80,20 @@ public class Canvas extends JPanel implements MouseListener, MouseMotionListener
     public void mousePressed(MouseEvent e) {
         if (!ativo || !SwingUtilities.isLeftMouseButton(e)) return;
 
-        x1 = e.getX();
-        y1 = e.getY();
-
+        // As coordenadas iniciais só são atualizadas para ferramentas
+        // que desenham enquanto o botão do mouse está pressionado.
+        // O triângulo guarda seus vértices separadamente, em mouseClicked.
         if (modoAtual == Ferramenta.PINCEL || modoAtual == Ferramenta.BORRACHA) {
+            x1 = e.getX();
+            y1 = e.getY();
             caminhoAtual = new Path2D.Double();
             caminhoAtual.moveTo(x1, y1);
             desenhando = true;
         } else if (modoAtual == Ferramenta.RETA
                 || modoAtual == Ferramenta.RETANGULO
                 || modoAtual == Ferramenta.CIRCULO) {
+            x1 = e.getX();
+            y1 = e.getY();
             x2 = x1;
             y2 = y1;
             desenhando = true;
@@ -158,7 +177,7 @@ public class Canvas extends JPanel implements MouseListener, MouseMotionListener
 
         if (modoAtual == Ferramenta.TRIANGULO) {
             adicionarPontoTriangulo(e.getPoint());
-        } 
+        }
     }
 
     private void adicionarPontoTriangulo(Point p) {
@@ -178,6 +197,7 @@ public class Canvas extends JPanel implements MouseListener, MouseMotionListener
             figuras.add(new FiguraCanvas(triangulo, corAtual, espessura));
             pontosTriangulo = 0;
             repaint();
+            aoFinalizarDesenho.run();
         }
     }
 
